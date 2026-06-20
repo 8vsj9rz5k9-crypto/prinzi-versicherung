@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     admin_username: str = "admin"
     admin_password: str = "password"
-    dev_access_token: str = "dev-token"
+    dev_access_token: str = ""
     openai_api_key: str = ""
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""

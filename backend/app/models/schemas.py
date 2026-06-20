@@ -1,11 +1,6 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel, EmailStr, Field
 
-
-def now_utc() -> datetime:
-    return datetime.now(timezone.utc)
-
-
 class CustomerCreate(BaseModel):
     name: str
     email: EmailStr
@@ -14,7 +9,7 @@ class CustomerCreate(BaseModel):
 
 class Customer(CustomerCreate):
     id: str
-    created_at: datetime = Field(default_factory=now_utc)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class PolicyCreate(BaseModel):
@@ -26,7 +21,7 @@ class PolicyCreate(BaseModel):
 
 class Policy(PolicyCreate):
     id: str
-    created_at: datetime = Field(default_factory=now_utc)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ClaimCreate(BaseModel):
@@ -39,7 +34,7 @@ class ClaimCreate(BaseModel):
 
 class Claim(ClaimCreate):
     id: str
-    created_at: datetime = Field(default_factory=now_utc)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ConversationCreate(BaseModel):
@@ -55,7 +50,7 @@ class Conversation(BaseModel):
     channel: str
     response: str
     source: str
-    created_at: datetime = Field(default_factory=now_utc)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class LoginRequest(BaseModel):

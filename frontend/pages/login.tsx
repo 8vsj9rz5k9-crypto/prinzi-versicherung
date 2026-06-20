@@ -3,8 +3,8 @@ import Layout from "../components/Layout";
 import { api } from "../lib/api";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("password");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [error, setError] = useState("");
 

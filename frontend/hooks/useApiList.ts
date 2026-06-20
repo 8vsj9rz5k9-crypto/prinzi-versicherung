@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useApiList<T>(loader: () => Promise<T[]>) {
+  const loaderRef = useRef(loader);
+  loaderRef.current = loader;
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    loader()
+    loaderRef.current()
       .then((items) => {
         if (active) {
           setData(items);
@@ -24,7 +26,7 @@ export function useApiList<T>(loader: () => Promise<T[]>) {
     return () => {
       active = false;
     };
-  }, [loader]);
+  }, []);
 
   return { data, loading, error };
 }
