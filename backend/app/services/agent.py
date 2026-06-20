@@ -103,7 +103,7 @@ class InsuranceAgent:
             return FALLBACK_RESPONSES["document"], "fallback"
 
         prompt = (
-            f"Please analyse the following insurance document"
+            f"Please analyze the following insurance document"
             f"{f' ({filename})' if filename else ''} and provide:\n"
             "1. A brief summary (2-3 sentences)\n"
             "2. Key coverage points\n"

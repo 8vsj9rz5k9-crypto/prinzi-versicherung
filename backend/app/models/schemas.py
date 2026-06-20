@@ -56,7 +56,6 @@ class Conversation(BaseModel):
 # Phase 2: message history within a conversation
 class MessageCreate(BaseModel):
     message: str
-    channel: str = "web"
     rating: int | None = None  # 1-5
 
 

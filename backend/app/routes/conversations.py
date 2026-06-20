@@ -14,13 +14,13 @@ router = APIRouter(prefix="/conversations", tags=["conversations"])
 
 @router.post("", response_model=Conversation)
 def create_conversation(payload: ConversationCreate) -> Conversation:
-    history = store.get_history(payload.customer_id)
-    response, source = generate_response(payload.message, history=history)
+    # New conversation starts without prior history
+    response, source = generate_response(payload.message)
     data = payload.model_dump()
     data["response"] = response
     data["source"] = source
     conversation = Conversation(**store.create(store.conversations, data))
-    # Persist to conversation memory keyed by conversation id
+    # Seed conversation memory with the opening exchange
     store.append_message(conversation.id, "user", payload.message)
     store.append_message(conversation.id, "assistant", response)
     return conversation

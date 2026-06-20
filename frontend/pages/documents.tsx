@@ -90,7 +90,7 @@ export default function DocumentsPage() {
           <div className="space-y-2">
             <input
               className="border rounded px-3 py-2 text-sm w-full"
-              placeholder="Dateiname (z.B. police_2024.txt)"
+              placeholder="Dateiname (z.B. versicherungspolice_2024.txt)"
               value={filename}
               onChange={(e) => setFilename(e.target.value)}
             />
