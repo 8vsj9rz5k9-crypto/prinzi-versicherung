@@ -13,6 +13,10 @@ def setup_function() -> None:
     store.messages.clear()
     store.documents.clear()
     store.conversation_memory.clear()
+    store.sms_messages.clear()
+    store.voice_calls.clear()
+    store.call_recordings.clear()
+    store.sms_queue.clear()
 
 
 def test_health() -> None:
@@ -161,3 +165,130 @@ def test_document_crud_and_analysis() -> None:
     # 404 cases
     assert client.get(f"/documents/{doc_id}").status_code == 404
     assert client.post(f"/documents/{doc_id}/analyze").status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 tests – SMS
+# ---------------------------------------------------------------------------
+
+def test_sms_send_fallback() -> None:
+    """POST /sms/send returns a stored SMS record in fallback mode."""
+    resp = client.post("/sms/send", json={"to": "+49123456789", "body": "Hallo Test"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["to"] == "+49123456789"
+    assert data["body"] == "Hallo Test"
+    assert data["status"] == "sent"
+    assert data["source"] == "fallback"
+    assert data["direction"] == "outbound"
+
+
+def test_sms_history() -> None:
+    """GET /sms/history returns stored SMS messages."""
+    # Send two messages
+    client.post("/sms/send", json={"to": "+49111", "body": "Erste Nachricht"})
+    client.post("/sms/send", json={"to": "+49222", "body": "Zweite Nachricht"})
+
+    history = client.get("/sms/history")
+    assert history.status_code == 200
+    assert len(history.json()) >= 2
+
+    # Filter by phone number
+    filtered = client.get("/sms/history", params={"phone": "+49111"})
+    assert filtered.status_code == 200
+    items = filtered.json()
+    assert all(i["to"] == "+49111" or i["from_"] == "+49111" for i in items)
+
+
+def test_twilio_sms_webhook_enhanced() -> None:
+    """POST /webhooks/twilio/sms stores the message and returns an agent response."""
+    resp = client.post("/webhooks/twilio/sms", data={"From": "+49001", "To": "+49002", "Body": "Testanfrage"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["from"] == "+49001"
+    assert data["message"] == "Testanfrage"
+    assert "response" in data
+    assert data["source"] in ("openai", "fallback")
+
+    # The messages should now be in history
+    history = client.get("/sms/history")
+    assert history.status_code == 200
+    assert any(m["from_"] == "+49001" for m in history.json())
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 tests – Voice / IVR
+# ---------------------------------------------------------------------------
+
+def test_voice_ivr_twiml() -> None:
+    """GET /voice/ivr returns valid TwiML XML."""
+    resp = client.get("/voice/ivr")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("application/xml")
+    body = resp.text
+    assert "<?xml" in body
+    assert "<Response>" in body
+    assert "<Gather" in body
+    assert "Prinzi Versicherung" in body
+
+
+def test_voice_ivr_handle_valid_digit() -> None:
+    """POST /voice/ivr/handle returns TwiML for a valid DTMF digit."""
+    for digit in ("1", "2", "3", "4"):
+        resp = client.post("/voice/ivr/handle", data={"Digits": digit})
+        assert resp.status_code == 200
+        assert resp.headers["content-type"].startswith("application/xml")
+        assert "<Response>" in resp.text
+
+
+def test_voice_ivr_handle_invalid_digit() -> None:
+    """POST /voice/ivr/handle with invalid digit returns error TwiML."""
+    resp = client.post("/voice/ivr/handle", data={"Digits": "9"})
+    assert resp.status_code == 200
+    assert "Ungültige Eingabe" in resp.text
+
+
+def test_voice_call_fallback() -> None:
+    """POST /voice/call returns a stored VoiceCall in fallback mode."""
+    resp = client.post("/voice/call", json={"to": "+49987654321"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["to"] == "+49987654321"
+    assert data["status"] == "queued"
+    assert data["source"] == "fallback"
+    assert data["direction"] == "outbound"
+
+
+def test_voice_recordings() -> None:
+    """GET /voice/recordings returns an empty list initially."""
+    resp = client.get("/voice/recordings")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
+
+
+def test_twilio_voice_webhook() -> None:
+    """POST /webhooks/twilio/voice returns TwiML IVR menu."""
+    resp = client.post(
+        "/webhooks/twilio/voice",
+        data={"CallSid": "CA123", "CallStatus": "ringing", "From": "+49001", "To": "+49002"},
+    )
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("application/xml")
+    assert "<Gather" in resp.text
+
+
+def test_twilio_recording_webhook() -> None:
+    """POST /webhooks/twilio/recording stores the recording."""
+    resp = client.post(
+        "/webhooks/twilio/recording",
+        data={"CallSid": "CA999", "RecordingUrl": "https://example.com/rec.mp3", "RecordingDuration": "42"},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "stored"
+    assert "recording_id" in data
+
+    # Verify it's retrievable
+    recs = client.get("/voice/recordings")
+    assert recs.status_code == 200
+    assert any(r["recording_url"] == "https://example.com/rec.mp3" for r in recs.json())

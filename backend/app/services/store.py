@@ -12,6 +12,11 @@ class MemoryStore:
         self.messages: MutableMapping[str, dict] = {}  # keyed by message id
         self.documents: MutableMapping[str, dict] = {}
         self.conversation_memory: MutableMapping[str, list[dict]] = {}  # conversation_id -> [msg dicts]
+        # Phase 3 additions
+        self.sms_messages: MutableMapping[str, dict] = {}
+        self.voice_calls: MutableMapping[str, dict] = {}
+        self.call_recordings: MutableMapping[str, dict] = {}
+        self.sms_queue: MutableMapping[str, dict] = {}
 
     def create(self, table: MutableMapping[str, dict], payload: dict) -> dict:
         item_id = str(uuid4())
