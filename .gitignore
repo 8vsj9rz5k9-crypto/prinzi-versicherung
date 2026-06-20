@@ -1,0 +1,5 @@
+code/backend/.env
+code/frontend/.env.local
+code/ai-engine/.env
+node_modules/
+.DS_Store
