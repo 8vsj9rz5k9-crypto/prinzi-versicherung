@@ -33,8 +33,11 @@ export default function LoginPage() {
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
+          id="password"
           className="w-full rounded border px-3 py-2"
           type="password"
+          aria-label="Password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
