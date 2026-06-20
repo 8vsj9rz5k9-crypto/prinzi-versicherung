@@ -107,3 +107,47 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+# Phase 3: SMS models
+class SMSSendRequest(BaseModel):
+    to: str
+    body: str
+    from_: str | None = None
+
+
+class SMSMessage(BaseModel):
+    id: str
+    from_: str
+    to: str
+    body: str
+    direction: str = "outbound"  # "inbound" | "outbound"
+    status: str = "queued"  # queued | sent | delivered | failed | received
+    source: str = "fallback"  # "twilio" | "fallback"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+# Phase 3: Voice models
+class VoiceCallRequest(BaseModel):
+    to: str
+    from_: str | None = None
+
+
+class VoiceCall(BaseModel):
+    id: str
+    from_: str
+    to: str
+    status: str = "queued"  # queued | ringing | in-progress | completed | failed | no-answer
+    direction: str = "outbound"  # "inbound" | "outbound"
+    duration: int | None = None  # seconds
+    recording_url: str | None = None
+    source: str = "fallback"  # "twilio" | "fallback"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class CallRecording(BaseModel):
+    id: str
+    call_id: str
+    recording_url: str
+    duration: int | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

@@ -7,6 +7,8 @@ const links = [
   ["Claims", "/claims"],
   ["Conversations", "/conversations"],
   ["Documents", "/documents"],
+  ["SMS", "/sms"],
+  ["Voice & IVR", "/voice"],
   ["Login", "/login"],
 ] as const;
 

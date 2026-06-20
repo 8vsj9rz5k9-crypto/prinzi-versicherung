@@ -13,6 +13,7 @@ def health() -> dict[str, str | dict[str, str]]:
         "environment": settings.environment,
         "services": {
             "openai": "configured" if settings.openai_api_key else "fallback",
-            "twilio": "configured" if settings.twilio_account_sid and settings.twilio_auth_token else "fallback",
+            "twilio_sms": "configured" if (settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_phone_number) else "fallback",
+            "twilio_voice": "configured" if (settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_phone_number) else "fallback",
         },
     }

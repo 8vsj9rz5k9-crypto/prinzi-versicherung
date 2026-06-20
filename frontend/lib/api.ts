@@ -1,4 +1,4 @@
-import type { Claim, Conversation, ConversationHistory, Customer, Document, Message, Policy } from "../types";
+import type { CallRecording, Claim, Conversation, ConversationHistory, Customer, Document, Message, Policy, SMSMessage, VoiceCall } from "../types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -47,4 +47,19 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ username, password }),
     }),
+  // Phase 3: SMS
+  sendSms: (to: string, body: string, from_?: string) =>
+    request<SMSMessage>("/sms/send", {
+      method: "POST",
+      body: JSON.stringify({ to, body, from_ }),
+    }),
+  smsHistory: (phone?: string) =>
+    request<SMSMessage[]>(`/sms/history${phone ? `?phone=${encodeURIComponent(phone)}` : ""}`),
+  // Phase 3: Voice
+  initiateCall: (to: string, from_?: string) =>
+    request<VoiceCall>("/voice/call", {
+      method: "POST",
+      body: JSON.stringify({ to, from_ }),
+    }),
+  voiceRecordings: () => request<CallRecording[]>("/voice/recordings"),
 };
