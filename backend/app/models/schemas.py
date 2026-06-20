@@ -53,6 +53,52 @@ class Conversation(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+# Phase 2: message history within a conversation
+class MessageCreate(BaseModel):
+    message: str
+    rating: int | None = None  # 1-5
+
+
+class Message(BaseModel):
+    id: str
+    conversation_id: str
+    role: str  # "user" | "assistant"
+    content: str
+    source: str = "fallback"
+    rating: int | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ConversationHistory(BaseModel):
+    conversation: Conversation
+    messages: list[Message]
+
+
+# Phase 2: documents
+class DocumentCreate(BaseModel):
+    filename: str
+    content_type: str = "text/plain"
+    text: str
+
+
+class Document(BaseModel):
+    id: str
+    filename: str
+    content_type: str
+    text: str
+    summary: str = ""
+    summary_source: str = "none"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class DocumentAnalyzeRequest(BaseModel):
+    force: bool = False
+
+
+class DocumentQARequest(BaseModel):
+    question: str
+
+
 class LoginRequest(BaseModel):
     username: str
     password: str
