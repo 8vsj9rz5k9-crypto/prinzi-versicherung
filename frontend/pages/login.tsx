@@ -23,7 +23,15 @@ export default function LoginPage() {
     <Layout>
       <form onSubmit={onSubmit} className="max-w-sm space-y-3 rounded border bg-white p-4">
         <h1 className="text-xl font-semibold">Login</h1>
-        <input className="w-full rounded border px-3 py-2" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input
+          id="username"
+          type="text"
+          aria-label="Username"
+          placeholder="Username"
+          className="w-full rounded border px-3 py-2"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
         <input
           className="w-full rounded border px-3 py-2"
           type="password"
