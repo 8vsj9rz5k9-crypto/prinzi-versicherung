@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  backend:
+    image: python:3.11-slim
+    working_dir: /app/backend
+    command: >
+      sh -lc "python -m pip install --no-cache-dir -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app/frontend
+    command: >
+      sh -lc "npm install && npm run build && npm run start -- -H 0.0.0.0 -p 3000"
+    ports:
+      - '3000:3000'
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://backend:8000}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-https://your-project.supabase.co}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-your-public-anon-key}
+      NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:-http://backend:8000}
+    volumes:
+      - ./:/app
+    depends_on:
+      - backend
