@@ -64,9 +64,7 @@ def get_document(document_id: str) -> Document:
 
 
 @router.post("/{document_id}/analyze", response_model=Document)
-def analyze_document(document_id: str, payload: DocumentAnalyzeRequest | None = None) -> Document:
-    if payload is None:
-        payload = DocumentAnalyzeRequest()
+def analyze_document(document_id: str, payload: DocumentAnalyzeRequest = DocumentAnalyzeRequest()) -> Document:
     item = store.documents.get(document_id)
     if not item:
         raise HTTPException(status_code=404, detail="Document not found")

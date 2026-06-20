@@ -120,7 +120,7 @@ def test_document_crud_and_analysis() -> None:
     doc = client.post(
         "/documents/text",
         json={
-            "filename": "police.txt",
+            "filename": "versicherungspolice.txt",
             "content_type": "text/plain",
             "text": "Diese Police deckt Hausrat gegen Feuer und Diebstahl ab. Deckungssumme: 50.000 EUR.",
         },

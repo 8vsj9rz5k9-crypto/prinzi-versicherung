@@ -11,6 +11,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# Maximum characters of document text sent to the model in a single request
+MAX_DOCUMENT_LENGTH = 8000
+
 SYSTEM_PROMPT = """You are a helpful insurance agent assistant for Prinzi Versicherung.
 You help customers with:
 - Policy inquiries (coverage, premiums, terms)
@@ -45,6 +48,7 @@ def _get_fallback(message: str) -> str:
     msg_lower = message.lower()
     if any(kw in msg_lower for kw in ("schaden", "claim", "unfall")):
         return FALLBACK_RESPONSES["claim"]
+    # "police" is the German term for an insurance policy document (die Police)
     if any(kw in msg_lower for kw in ("police", "policy", "versicherung", "vertrag")):
         return FALLBACK_RESPONSES["policy"]
     return FALLBACK_RESPONSES["default"]
@@ -109,7 +113,7 @@ class InsuranceAgent:
             "2. Key coverage points\n"
             "3. Important exclusions or limitations\n"
             "4. Action items for the customer\n\n"
-            f"Document text:\n{text[:8000]}"
+            f"Document text:\n{text[:MAX_DOCUMENT_LENGTH]}"
         )
         try:
             completion = self._client.chat.completions.create(
@@ -135,7 +139,7 @@ class InsuranceAgent:
         prompt = (
             f"Based on the following insurance document, answer this question:\n"
             f"Question: {question}\n\n"
-            f"Document:\n{document_text[:8000]}"
+            f"Document:\n{document_text[:MAX_DOCUMENT_LENGTH]}"
         )
         try:
             completion = self._client.chat.completions.create(
