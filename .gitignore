@@ -2,4 +2,9 @@ code/backend/.env
 code/frontend/.env.local
 code/ai-engine/.env
 node_modules/
+.next/
+frontend/.next/
+backend/.pytest_cache/
+**/__pycache__/
+.env
 .DS_Store
