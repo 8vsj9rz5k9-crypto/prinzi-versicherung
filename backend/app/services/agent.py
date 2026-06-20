@@ -48,7 +48,7 @@ def _get_fallback(message: str) -> str:
     msg_lower = message.lower()
     if any(kw in msg_lower for kw in ("schaden", "claim", "unfall")):
         return FALLBACK_RESPONSES["claim"]
-    # "police" is the German term for an insurance policy document (die Police)
+    # "Police" is the German term for an insurance policy document (die Police)
     if any(kw in msg_lower for kw in ("police", "policy", "versicherung", "vertrag")):
         return FALLBACK_RESPONSES["policy"]
     return FALLBACK_RESPONSES["default"]
