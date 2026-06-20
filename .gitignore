@@ -1,5 +1,22 @@
-code/backend/.env
-code/frontend/.env.local
-code/ai-engine/.env
+# Environment files (never commit real credentials)
+.env
+backend/.env
+frontend/.env.local
+
+# Node
 node_modules/
+.next/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# OS
 .DS_Store
+Thumbs.db
